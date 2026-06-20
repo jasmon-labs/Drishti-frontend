@@ -1,96 +1,40 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useState } from "react";
-import {
-  LayoutDashboard, ScanSearch, FileSearch, BarChart3, Truck, Flame, ServerCog,
-  ChevronLeft, ChevronRight, Siren,
-} from "lucide-react";
-import { ACTIVE_ALERTS_SUMMARY } from "@/lib/mockData";
+import { LayoutDashboard, ScanSearch, FileSearch, BarChart3, Truck, Flame, ServerCog, Zap } from "lucide-react";
 
 const NAV = [
-  { to: "/", label: "Command Center", icon: LayoutDashboard, code: "CC-01" },
-  { to: "/analyze", label: "Analyze", icon: ScanSearch, code: "AN-02" },
-  { to: "/evidence", label: "Evidence Log", icon: FileSearch, code: "EV-03" },
-  { to: "/analytics", label: "Analytics", icon: BarChart3, code: "AT-04" },
-  { to: "/fleet", label: "Fleet Intelligence", icon: Truck, code: "FL-05" },
-  { to: "/hotspots", label: "Hotspot Prediction", icon: Flame, code: "HP-06" },
-  { to: "/system", label: "System Status", icon: ServerCog, code: "SY-07" },
-] as const;
+  { to: "/", label: "HUD", icon: LayoutDashboard, code: "CC-01" },
+  { to: "/analyze", label: "SCAN", icon: ScanSearch, code: "AN-02" },
+  { to: "/evidence", label: "LOG", icon: FileSearch, code: "EV-03" },
+  { to: "/hotspots", label: "GRID", icon: Flame, code: "HP-06" },
+  { to: "/fleet", label: "FLEET", icon: Truck, code: "FL-05" },
+  { to: "/system", label: "SYS", icon: ServerCog, code: "SY-07" },
+];
 
 export function AppSidebar() {
-  const [collapsed, setCollapsed] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <aside
-      className={`relative z-10 flex h-full shrink-0 flex-col border-r border-border bg-surface/50 backdrop-blur-xl transition-[width] duration-300 ${
-        collapsed ? "w-[68px]" : "w-[244px]"
-      }`}
-    >
-      <div className="flex items-center justify-between px-3 py-3">
-        {!collapsed && (
-          <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
-            Modules
-          </div>
-        )}
-        <button
-          onClick={() => setCollapsed((c) => !c)}
-          className="grid h-7 w-7 place-items-center rounded-md border border-border bg-surface text-muted-foreground transition hover:text-foreground hover:bg-accent"
-          aria-label="Toggle sidebar"
-        >
-          {collapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
-        </button>
-      </div>
-
-      <nav className="flex flex-1 flex-col gap-0.5 px-2">
+    <aside className="w-16 border-r border-white/10 bg-black/40 backdrop-blur-md flex flex-col justify-between items-center py-4">
+      <div className="flex flex-col items-center gap-6">
+        <div className="w-10 h-10 bg-primary/20 border border-primary/40 flex items-center justify-center mb-4">
+          <Zap size={20} className="text-primary fill-primary/20" />
+        </div>
+        
         {NAV.map((item) => {
           const active = pathname === item.to;
-          const Icon = item.icon;
           return (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={`group relative flex items-center gap-3 rounded-md px-2.5 py-2 text-sm transition ${
-                active
-                  ? "bg-primary/10 text-foreground"
-                  : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
-              }`}
-            >
-              {active && (
-                <span className="absolute inset-y-1 left-0 w-[2px] rounded-r bg-primary shadow-[0_0_12px_var(--primary)]" />
-              )}
-              <Icon className={`h-4 w-4 shrink-0 ${active ? "text-primary" : ""}`} />
-              {!collapsed && (
-                <>
-                  <span className="flex-1 truncate">{item.label}</span>
-                  <span className="mono text-[9px] tracking-widest text-muted-foreground/70">{item.code}</span>
-                </>
-              )}
+            <Link key={item.to} to={item.to} className="group relative flex flex-col items-center gap-1">
+              <div className={`p-2 transition-all ${active ? 'bg-primary/20 border border-primary/50 text-primary' : 'text-slate-500 hover:text-slate-100'}`}>
+                <item.icon size={18} />
+              </div>
+              <span className={`text-[8px] font-mono font-bold tracking-tighter ${active ? 'text-primary' : 'text-slate-600'}`}>
+                {item.code}
+              </span>
+              {active && <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary shadow-[0_0_10px_var(--primary)]" />}
             </Link>
           );
         })}
-      </nav>
-
-      {!collapsed && (
-        <div className="m-3 rounded-md border border-destructive/40 bg-destructive/5 p-3">
-          <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-destructive">
-            <Siren className="h-3 w-3 animate-pulse" /> Active Alerts
-          </div>
-          <div className="mt-2 flex items-baseline gap-1.5">
-            <div className="mono text-2xl font-semibold text-foreground tabular-nums">{ACTIVE_ALERTS_SUMMARY.active}</div>
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">live</div>
-          </div>
-          <div className="mt-2 grid grid-cols-2 gap-1.5 text-[10px]">
-            <div className="rounded border border-warning/30 bg-warning/10 px-1.5 py-1">
-              <div className="mono text-sm font-semibold text-warning">{ACTIVE_ALERTS_SUMMARY.escalated}</div>
-              <div className="uppercase tracking-wider text-muted-foreground">Escalated</div>
-            </div>
-            <div className="rounded border border-primary/30 bg-primary/10 px-1.5 py-1">
-              <div className="mono text-sm font-semibold text-primary">{ACTIVE_ALERTS_SUMMARY.predicted}</div>
-              <div className="uppercase tracking-wider text-muted-foreground">Predicted</div>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </aside>
   );
 }
